@@ -1,0 +1,12 @@
+{
+  "name": "foodrush-api",
+  "version": "1.0.0",
+  "description": "FoodRush - Food Delivery App API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
