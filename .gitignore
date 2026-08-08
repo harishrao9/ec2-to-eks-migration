@@ -5,6 +5,7 @@
 *.tfvars
 .terraform.lock.hcl
 terraform.tfplan
+*.pem
 
 # Node
 node_modules/

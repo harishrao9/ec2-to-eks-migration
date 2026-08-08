@@ -79,7 +79,7 @@ resource "aws_security_group" "ec2" {
 # EC2 Instance (Free Tier t2.micro)
 resource "aws_instance" "app" {
   ami                    = var.ami_id
-  instance_type          = "t2.micro"
+  instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.key_name
