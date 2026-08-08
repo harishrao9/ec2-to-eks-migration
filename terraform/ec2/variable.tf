@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "ami_id" {
-  description = "Amazon Linux 2 AMI for ap-south-1"
+  description = "Ubuntu 22.04 AMI for ap-south-1"
   default     = "ami-0f5ee92e2d63afc18"
 }
 

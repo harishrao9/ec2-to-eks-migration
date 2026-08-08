@@ -84,21 +84,34 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.key_name
 
-  user_data = <<-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y docker
-    systemctl start docker
-    systemctl enable docker
-    docker pull ghcr.io/harishrao9/foodrush:latest
-    docker run -d \
-      -p 3000:3000 \
-      -e APP_ENV=EC2 \
-      -e APP_VERSION=1.0.0 \
-      --name foodrush \
-      --restart always \
-      ghcr.io/harishrao9/foodrush:latest
-  EOF
+user_data = <<-EOF
+  #!/bin/bash
+  exec > /var/log/user-data.log 2>&1
+  set -x
+
+  # Update packages
+  apt-get update -y
+
+  # Install Docker
+  apt-get install -y docker.io
+  systemctl start docker
+  systemctl enable docker
+
+  # Wait for Docker to be ready
+  sleep 10
+
+  # Pull and run FoodRush
+  docker pull ghcr.io/harishrao9/foodrush:latest
+  docker run -d \
+    -p 3000:3000 \
+    -e APP_ENV=EC2 \
+    -e APP_VERSION=1.0.0 \
+    --name foodrush \
+    --restart always \
+    ghcr.io/harishrao9/foodrush:latest
+
+  echo "FoodRush started successfully"
+EOF
 
   tags = { Name = "foodrush-ec2" }
 }
