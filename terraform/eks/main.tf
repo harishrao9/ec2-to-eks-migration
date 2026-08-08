@@ -116,7 +116,7 @@ resource "aws_iam_role_policy_attachment" "eks_ecr" {
 resource "aws_eks_cluster" "main" {
   name     = "foodrush-eks"
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.29"
+  version  = "1.32"
 
   vpc_config {
     subnet_ids = [aws_subnet.eks_a.id, aws_subnet.eks_b.id]
