@@ -73,6 +73,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  # Salt Master ports
+ingress {
+  from_port   = 4505
+  to_port     = 4506
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
   tags = { Name = "foodrush-ec2-sg" }
 }
 
@@ -115,3 +122,41 @@ EOF
 
   tags = { Name = "foodrush-ec2" }
 }
+
+# Salt Minion EC2 Instance (Free Tier)
+resource "aws_instance" "salt_minion" {
+  ami                    = var.ami_id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.ec2.id]
+  key_name               = var.key_name
+
+  user_data = <<-EOF
+    #!/bin/bash
+    exec > /var/log/user-data.log 2>&1
+    set -x
+
+    # Update packages
+    apt-get update -y
+
+    # Install Docker
+    apt-get install -y docker.io
+    systemctl start docker
+    systemctl enable docker
+
+    # Pull and run FoodRush
+    docker pull ghcr.io/harishrao9/foodrush:latest
+    docker run -d \
+      -p 3000:3000 \
+      -e APP_ENV=EC2 \
+      -e APP_VERSION=1.0.0 \
+      --name foodrush \
+      --restart always \
+      ghcr.io/harishrao9/foodrush:latest
+
+    echo "Salt Minion server ready"
+  EOF
+
+  tags = { Name = "foodrush-salt-minion" }
+}
+
